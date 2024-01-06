@@ -110,7 +110,13 @@ if is_ipython:
 plt.ion()
 
 # if GPU is to be used
-device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+# device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+if torch.backends.mps.is_available():
+    device = torch.device("mps")
+elif torch.cuda.is_available():
+    device = torch.device("cuda")
+else:
+    device = torch.device("cpu")
 
 Transition = namedtuple('Transition',
                         ('state', 'action', 'next_state', 'reward'))
@@ -294,7 +300,7 @@ def optimize_model():
     torch.nn.utils.clip_grad_value_(policy_net.parameters(), 100)
     optimizer.step()
 
-if torch.backends.mps.is_available():
+if torch.backends.mps.is_available() or torch.cuda.is_available():
     num_episodes = 500 #600
 else:
     num_episodes = 50
