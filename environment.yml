@@ -1,0 +1,8 @@
+name: PacmanOpenAIGym_FHDortmund
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - gym==0.26.1
+  - pygame==2.1.3
+  - pip
