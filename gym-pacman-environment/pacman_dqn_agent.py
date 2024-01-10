@@ -34,6 +34,12 @@ level = [
     ["#", "#", "#", "*", "#", "#", "#"],
 ]
 
+# level = []
+# with open('Pacman_Level\\RL05_intersecting_tunnels_H_R.pml') as levelFile:
+#     for line in levelFile:
+#         level.append([*line][:-1])
+
+
 # You can set this to False to change the agent's observation to Box from OpenAIGym - see also PacmanEnv.py
 # Otherwise a 2D array of tileTypes will be used
 usingSimpleObservations = False
@@ -143,8 +149,8 @@ class DQN(nn.Module):
     def __init__(self, n_observations, n_actions):
         super(DQN, self).__init__()
         self.layer1 = nn.Linear(n_observations, 128)
-        self.layer2 = nn.Linear(128, 128)
-        self.layer3 = nn.Linear(128, n_actions)
+        self.layer2 = nn.Linear(128, 256)
+        self.layer3 = nn.Linear(256, n_actions)
 
     # Called with either one element to determine next action, or a batch
     # during optimization. Returns tensor([[left0exp,right0exp]...]).

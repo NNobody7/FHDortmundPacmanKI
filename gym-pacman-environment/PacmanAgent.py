@@ -11,15 +11,21 @@ score_threshold = 0.19
 printState = True
 
 # TODO Set this to the desired level
-level = [
-    ["#", "#", "#", "#", "#", "#", "#"],
-    ["#", "*", "*", "P", "*", "*", "#"],
-    ["*", "*", "#", "*", "#", "*", "*"],
-    ["#", "*", "*", "*", "*", "*", "#"],
-    ["#", "#", "*", "#", "*", "#", "#"],
-    ["#", "H", "*", "*", "*", "R", "#"],
-    ["#", "#", "#", "*", "#", "#", "#"],
-]
+# level = [
+#     ["#", "#", "#", "#", "#", "#", "#"],
+#     ["#", "*", "*", "P", "*", "*", "#"],
+#     ["*", "*", "#", "*", "#", "*", "*"],
+#     ["#", "*", "*", "*", "*", "*", "#"],
+#     ["#", "#", "*", "#", "*", "#", "#"],
+#     ["#", "H", "*", "*", "*", "R", "#"],
+#     ["#", "#", "#", "*", "#", "#", "#"],
+# ]
+
+level = []
+with open('Pacman_Level\RL03_square_tunnel_R.pml') as levelFile:
+    for line in levelFile:
+        level.append([*line][:-1])
+
 
 # You can set this to False to change the agent's observation to Box from OpenAIGym - see also PacmanEnv.py
 # Otherwise a 2D array of tileTypes will be used
