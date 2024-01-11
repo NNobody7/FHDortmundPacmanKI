@@ -23,6 +23,7 @@ level = [
 
 
 def setLevel(name):
+    global level
     level = []
     with open(f'Pacman_Level\{name}') as levelFile:
         for line in levelFile:

@@ -35,7 +35,7 @@ else:
 ## env, vars
 
 ### LEVEL SELECTION
-levelName = "RL05_intersecting_tunnels_H_R.pml"
+levelName = "RL02_square_tunnel_H.pml"
 PacmanAgent.setLevel(levelName)
 ### LEVEL SELECTION END
 
@@ -217,6 +217,5 @@ plt.show()
 torch.save(policy_net.state_dict(), levelName+'.pth')
 print('saved the model')
 
-print('playing')
 # Set the policy_net in evaluation mode
 policy_net.eval()
