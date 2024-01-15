@@ -52,8 +52,9 @@ target_net = DQN(n_observations, n_actions).to(device)
 target_net.load_state_dict(policy_net.state_dict())
 
 optimizer = optim.AdamW(policy_net.parameters(), lr=LR, amsgrad=True)
-memory = ReplayMemory(10000)
+memory = ReplayMemory(500)
 episode_durations = []
+episode_rewards = []
 
 
 # FUNCTION DEFS
@@ -83,6 +84,33 @@ def plot_durations(show_result=False):
             display.clear_output(wait=True)
         else:
             display.display(plt.gcf())
+
+
+def plot_rewards(show_result=False):
+    plt.figure(1)
+    rewards_t = torch.tensor(episode_rewards, dtype=torch.float)
+    if show_result:
+        plt.title('Result')
+    else:
+        plt.clf()
+        plt.title('Training...')
+    plt.xlabel('Episode')
+    plt.ylabel('Reward')
+    plt.plot(rewards_t.numpy())
+    # Take 100 episode averages and plot them too
+    if len(rewards_t) >= 100:
+        means = rewards_t.unfold(0, 100, 1).mean(1).view(-1)
+        means = torch.cat((torch.zeros(99), means))
+        plt.plot(means.numpy())
+
+    plt.pause(0.001)  # pause a bit so that plots are updated
+    if is_ipython:
+        if not show_result:
+            display.display(plt.gcf())
+            display.clear_output(wait=True)
+        else:
+            display.display(plt.gcf())
+
 
 
 
@@ -156,7 +184,7 @@ def select_action(state):
 # MAIN
     
 if torch.backends.mps.is_available() or torch.cuda.is_available():
-    num_episodes = 500 #600
+    num_episodes = 2000 #600
 else:
     num_episodes = 50
 
@@ -165,9 +193,12 @@ for i_episode in range(num_episodes):
     # Initialize the environment and get it's state
     state = env.reset()
     state = torch.tensor(state, dtype=torch.float32, device=device).flatten().unsqueeze(0)
+    total_reward = 0
     for t in count():
+
         action = select_action(state)
         observation, reward, terminated, truncated = env.step(action.item())
+        total_reward += reward
         reward = torch.tensor([reward], device=device)
         done = terminated or truncated
 
@@ -194,9 +225,14 @@ for i_episode in range(num_episodes):
         target_net.load_state_dict(target_net_state_dict)
 
         if done:
-            episode_durations.append(reward)
-            plot_durations()
+            # episode_durations.append(t + 1)
+            # plot_durations()
+            episode_rewards.append(t + 1)
+            plot_rewards()
             break
+
+    print(memory.__len__())
+    print("episode ", i_episode, "has total reward", total_reward)
 
 print('Complete')
 plot_durations(show_result=True)
