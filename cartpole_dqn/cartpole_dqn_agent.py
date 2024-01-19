@@ -76,6 +76,7 @@ LR = 1e-4
 
 # Get number of actions from gym action space
 n_actions = env.action_space.n
+print('action space', n_actions)
 # Get the number of state observations
 state, info = env.reset()
 n_observations = len(state)
@@ -102,6 +103,7 @@ def select_action(state):
             # t.max(1) will return the largest column value of each row.
             # second column on max result is index of where max element was
             # found, so we pick action with the larger expected reward.
+            # print('policy net state', policy_net(state))
             return policy_net(state).max(1).indices.view(1, 1)
     else:
         return torch.tensor([[env.action_space.sample()]], device=device, dtype=torch.long)
@@ -155,6 +157,8 @@ def optimize_model():
     action_batch = torch.cat(batch.action)
     reward_batch = torch.cat(batch.reward)
 
+
+
     # Compute Q(s_t, a) - the model computes Q(s_t), then we select the
     # columns of actions taken. These are the actions which would've been taken
     # for each batch state according to policy_net
@@ -183,7 +187,7 @@ def optimize_model():
     optimizer.step()
 
 if torch.backends.mps.is_available():
-    num_episodes = 600
+    num_episodes = 100
 else:
     num_episodes = 50
 
@@ -202,6 +206,8 @@ for i_episode in range(num_episodes):
         else:
             next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
 
+        print('state size: ', state.shape)
+        print('action size: ', action.shape)
         # Store the transition in memory
         memory.push(state, action, next_state, reward)
 
@@ -228,3 +234,43 @@ print('Complete')
 plot_durations(show_result=True)
 plt.ioff()
 plt.show()
+
+# Save the trained model
+torch.save(policy_net.state_dict(), 'trained_dqn_model.pth')
+print('saved the model')
+
+print('playing')
+# Set the policy_net in evaluation mode
+policy_net.eval()
+
+# Number of episodes to play for testing
+num_test_episodes = 10
+env = gym.make("CartPole-v1", render_mode="human")
+for i_episode in range(num_test_episodes):
+    state, info = env.reset()
+    state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
+
+
+    for t in count():
+        # Use the trained policy network to select actions
+        with torch.no_grad():
+            action = policy_net(state).max(1).indices.view(1, 1)
+
+        # Take the action in the environment
+        observation, reward, terminated, truncated, _ = env.step(action.item())
+
+        # Display the environment
+        env.render()
+        # print('rendering')
+
+        # Update the state for the next step
+        state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
+
+        # Check if the episode is done
+        if terminated or truncated:
+            break
+    
+    print('next')
+# Close the environment after testing
+env.close()
+
