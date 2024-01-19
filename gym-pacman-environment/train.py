@@ -35,7 +35,7 @@ else:
 ## env, vars
 
 ### LEVEL SELECTION
-levelName = "RL05_intersecting_tunnels_H_R.pml"
+levelName = "RL03_square_tunnel_R.pml"
 PacmanAgent.setLevel(levelName)
 ### LEVEL SELECTION END
 
@@ -184,7 +184,7 @@ def select_action(state):
 # MAIN
     
 if torch.backends.mps.is_available() or torch.cuda.is_available():
-    num_episodes = 2000 #600
+    num_episodes = 3000 #600
 else:
     num_episodes = 50
 
@@ -235,7 +235,7 @@ for i_episode in range(num_episodes):
     print("episode ", i_episode, "has total reward", total_reward)
 
 print('Complete')
-plot_durations(show_result=True)
+# plot_rewards(show_result=True)
 plt.ioff()
 plt.show()
 
