@@ -15,7 +15,7 @@ else:
     device = torch.device("cpu")
 
 
-levelName = "RL02_square_tunnel_H.pml"
+levelName = "RL05_intersecting_tunnels_H_R.pml"
 PacmanAgent.setLevel(levelName)
 
 env = PacmanAgent.PacmanAgent()

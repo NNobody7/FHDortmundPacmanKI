@@ -35,7 +35,7 @@ else:
 ## env, vars
 
 ### LEVEL SELECTION
-levelName = "RL02_square_tunnel_H.pml"
+levelName = "RL05_intersecting_tunnels_H_R.pml"
 PacmanAgent.setLevel(levelName)
 ### LEVEL SELECTION END
 
@@ -68,7 +68,7 @@ def plot_durations(show_result=False):
         plt.clf()
         plt.title('Training...')
     plt.xlabel('Episode')
-    plt.ylabel('Duration')
+    plt.ylabel('Reward')
     plt.plot(durations_t.numpy())
     # Take 100 episode averages and plot them too
     if len(durations_t) >= 100:
@@ -104,16 +104,11 @@ def optimize_model():
                                                 if s is not None])
     state_batch = torch.cat(batch.state)
     action_batch = torch.cat(batch.action)
-    # action_batch = torch.cat(batch.action).view(-1, 1)
     reward_batch = torch.cat(batch.reward)
-    # print('dimension of action batch', action_batch.size())
-    # print('dimension of state batch', state_batch.size())
 
     # Compute Q(s_t, a) - the model computes Q(s_t), then we select the
     # columns of actions taken. These are the actions which would've been taken
     # for each batch state according to policy_net
-    # print(action_batch)
-    # print(state_batch)
     
     state_action_values = policy_net(state_batch).gather(1, action_batch)
 
@@ -169,7 +164,6 @@ else:
 for i_episode in range(num_episodes):
     # Initialize the environment and get it's state
     state = env.reset()
-    # print('original state size: ', torch.tensor(state, dtype=torch.float32).shape)
     state = torch.tensor(state, dtype=torch.float32, device=device).flatten().unsqueeze(0)
     for t in count():
         action = select_action(state)
@@ -182,8 +176,6 @@ for i_episode in range(num_episodes):
         else:
             next_state = torch.tensor(observation, dtype=torch.float32, device=device).flatten().unsqueeze(0)
 
-        # print('state size: ', state.shape)
-        # print('action size: ', action.shape)
         # Store the transition in memory
         memory.push(state, action, next_state, reward)
 
@@ -202,7 +194,7 @@ for i_episode in range(num_episodes):
         target_net.load_state_dict(target_net_state_dict)
 
         if done:
-            episode_durations.append(t + 1)
+            episode_durations.append(reward)
             plot_durations()
             break
 
